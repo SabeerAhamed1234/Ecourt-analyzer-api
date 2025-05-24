@@ -1,0 +1,4 @@
+.env
+__pycache__/
+*.pyc
+# Add any other files or directories you want to ignore
