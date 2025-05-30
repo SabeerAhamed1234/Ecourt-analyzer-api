@@ -360,6 +360,19 @@ def analyze_cases(request_data, response_data):
                             "request were found to match in this case record."
                         )
                 # --- END OF REFINED REASON ---
+
+
+                 # *** START OF CHANGE ***
+                case_link_url = case_identifiers_for_llm.get('case_link')
+                llm_case_link_markdown = "Not available" # Default
+                if case_link_url and isinstance(case_link_url, str) and \
+                   (case_link_url.startswith("http://") or case_link_url.startswith("https://")):
+                    llm_case_link_markdown = f"[View Case Details]({case_link_url})"
+                elif case_link_url and isinstance(case_link_url, str): # It's a string, but not a typical http/https URL
+                    llm_case_link_markdown = f"{case_link_url} (Link provided as text)"
+                # *** END OF CHANGE ***
+
+
         
                 prompt_for_case_explanation = f"""
         You are an AI legal analyst. Your task is to provide a neat, clean, and clear explanation in bullet points about the potential relevance of a specific court case to a person of interest, based on programmatic findings of data overlaps. Do NOT use the word "accused". Do not mention "programmatic" or "normalized" in your output.
@@ -381,16 +394,16 @@ def analyze_cases(request_data, response_data):
         
         Explanation for Case {index + 1} (Strictly use bullet points for each section below. Be factual and clear.):
         
-        *   **Primary Name Assessment:**
+        *   Primary Name Assessment:
             *   The name '{request_data.get('name')}' provided in the request was **{llm_prompt_input_summary['primary_name_match_status_for_case']}** with a party name in this case.
             {(f"    *   It matched with: '{llm_prompt_input_summary['details_of_matched_fields'][0]['matched_value_in_case']}' (found in case field: {llm_prompt_input_summary['details_of_matched_fields'][0].get('source_in_case', 'N/A')}).") if primary_name_matched and llm_prompt_input_summary['details_of_matched_fields'] and llm_prompt_input_summary['details_of_matched_fields'][0]['request_field'] == 'name' else ""}
         
-        *   **Matched Data Points from Request in this Case:**
+        *   Matched Data Points from Request in this Case:
         {matched_bullets_str}
-        *   **Reason for Potential Relevance ({llm_prompt_input_summary['overall_potential_relevance_for_case']}):**
+        *   Reason for Potential Relevance ({llm_prompt_input_summary['overall_potential_relevance_for_case']}):
             *   {reason_for_relevance_text_for_llm}
         
-        *   **Case Description:**
+        *   Case Description:
             *   Case: {case_identifiers_for_llm['case_name']} ({case_identifiers_for_llm['year']})
             *   Court: {case_identifiers_for_llm['court_name']}
             *   Type: {case_identifiers_for_llm['case_type_name']}
@@ -398,10 +411,10 @@ def analyze_cases(request_data, response_data):
             *   Petitioner(s): {case_identifiers_for_llm['petitioner']}
             *   Respondent(s): {case_identifiers_for_llm['respondent']}
         
-        *   **Case Link:**
-            *   Link: {case_identifiers_for_llm['case_link'] if case_identifiers_for_llm['case_link'] else 'Not available'}
+        *   Case Link:
+            *   Link: {llm_case_link_markdown}
         
-        *   **Mismatched Data Points from Request in this Case (for context):**
+        *   Mismatched Data Points from Request in this Case (for context):
         {mismatched_bullets_str}
         """
                 analysis_results.append({
@@ -534,4 +547,4 @@ def health_check():
 
 # --- For local development/testing ONLY (remove for Render deployment) ---
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, use_reloader=False)
