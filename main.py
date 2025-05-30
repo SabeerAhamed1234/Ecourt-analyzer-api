@@ -241,7 +241,7 @@ def analyze_cases(request_data, response_data):
                     if non_state_matches_exist:
                         is_potentially_relevant = True
         
-                potential_relevance_status_for_case = "Potentially Relevant" if is_potentially_relevant else "No Apparent Relevance"
+                potential_relevance_status_for_case = "Potentially Relevant" if is_potentially_relevant else "Potentially Not Relevant"
             
                 case_identifiers_for_llm = {
                     "case_name": str(case_item_dict.get("case_name", "N/A"))[:70],
@@ -338,7 +338,7 @@ def analyze_cases(request_data, response_data):
         
                         if is_only_state_match:
                             reason_for_relevance_text_for_llm = (
-                                "This case is flagged as having no apparent relevance because, although the 'state' field matched, "
+                                "This case is flagged as having Potentially Not Relevant because, although the 'state' field matched, "
                                 "no other significant data points from the request were found in this case record. "
                                 "A 'state'-only match is not considered a strong indicator of specific relevance by the system."
                             )
@@ -350,13 +350,13 @@ def analyze_cases(request_data, response_data):
                             # while relevance is "No Apparent Relevance" is an inconsistency.
                             # However, the most direct explanation for "No Apparent Relevance" when some matches are listed is:
                             reason_for_relevance_text_for_llm = (
-                                "This case is flagged as having no apparent relevance. While some data points might have matched "
+                                "This case is flagged as having Potentially Not Relevant. While some data points might have matched "
                                 "(as shown in 'Matched Data Points'), they did not meet the criteria for a strong potential connection "
                                 "(e.g., a significant non-'state' field match was required by the system but not found or not deemed sufficient)."
                             )
                     else: # No matches at all in llm_prompt_input_summary['details_of_matched_fields']
                         reason_for_relevance_text_for_llm = (
-                            "This case is flagged as having no apparent relevance because no data points from the "
+                            "This case is flagged as having Potentially Not Relevant because no data points from the "
                             "request were found to match in this case record."
                         )
                 # --- END OF REFINED REASON ---
