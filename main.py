@@ -361,19 +361,7 @@ def analyze_cases(request_data, response_data):
                         )
                 # --- END OF REFINED REASON ---
 
-
-                 # *** START OF CHANGE ***
-                case_link_url = case_identifiers_for_llm.get('case_link')
-                llm_case_link_markdown = "Not available" # Default
-                if case_link_url and isinstance(case_link_url, str) and \
-                   (case_link_url.startswith("http://") or case_link_url.startswith("https://")):
-                    llm_case_link_markdown = f"[View Case Details]({case_link_url})"
-                elif case_link_url and isinstance(case_link_url, str): # It's a string, but not a typical http/https URL
-                    llm_case_link_markdown = f"{case_link_url} (Link provided as text)"
-                # *** END OF CHANGE ***
-
-
-        
+       
                 prompt_for_case_explanation = f"""
         You are an AI legal analyst. Your task is to provide a neat, clean, and clear explanation in bullet points about the potential relevance of a specific court case to a person of interest, based on programmatic findings of data overlaps. Do NOT use the word "accused". Do not mention "programmatic" or "normalized" in your output.
         
@@ -412,7 +400,7 @@ def analyze_cases(request_data, response_data):
             *   Respondent(s): {case_identifiers_for_llm['respondent']}
         
         *   Case Link:
-            *   Link: {llm_case_link_markdown}
+    *    Link: <a href="{case_identifiers_for_llm['case_link']}" target="_blank" rel="noopener noreferrer">{case_identifiers_for_llm['case_link']}</a>
         
         *   Mismatched Data Points from Request in this Case (for context):
         {mismatched_bullets_str}
